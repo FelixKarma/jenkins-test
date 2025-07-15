@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        def response = httpRequest url: 'https://httpbin.org/get'
+                        def response = httpRequest url: 'https://postman-echo.com/get'
                         echo "Réponse : ${response.content}"
                     } catch (Exception e) {
                         error "erreur :  ${e.message}"
