@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    stages {
+        stage("Parallèle et Séquentiel") {
+            parallel {
+                branche1 {
+                    stages {
+                        stage("Étape 1 - Compilation") {
+                            steps {
+                                echo "Compilation du projet"
+                            }
+                        }
+                        stage("Étape 2 - Tests") {
+                            steps {
+                                echo "Exécution des tests"
+                            }
+                        }
+                    }
+                }
+
+                branche2 {
+                    stages {
+                        stage("Analyse statique") {
+                            steps {
+                                echo "Analyse du code avec SonarQube"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Déploiement") {
+            steps {
+                echo "Déploiement en production"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Fin du pipeline"
+        }
+    }
+}
