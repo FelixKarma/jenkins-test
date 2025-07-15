@@ -1,38 +1,65 @@
-
-
 pipeline {
-    agent none
+    agent any 
+    
+    environment {
+        url_api = "http://youtube.com"
+    }
+    
     stages {
-        stage('Run Tests') {
+        stage("etape1") {
+            steps {
+                echo "ce que je veux"
+                script {
+                    def unNom = 2
+                    echo "${unNom}"
+                }
+            }
+        }
+
+        stage("Parallèle") {
             parallel {
-                stage('Test On Windows') {
-                    agent {
-                        label "windows"
-                    }
+                stage("jobA") {
                     steps {
-                        bat "run-tests.bat"
-                    }
-                    post {
-                        always {
-                            junit "**/TEST-*.xml"
-                        }
+                        echo "Tâche parallèle A"
                     }
                 }
-                stage('Test On Linux') {
-                    agent {
-                        label "linux"
-                    }
+                stage("jobB") {
                     steps {
-                        sh "run-tests.sh"
+                        echo "Tâche parallèle B"
                     }
-                    post {
-                        always {
-                            junit "**/TEST-*.xml"
-                        }
+                }
+            }
+        }
+
+        stage("url-api") {
+            steps {
+                echo "va sur ... : ${url_api}"
+            }
+        }
+
+        stage("tryCatch") {
+            steps {
+                script {
+                    try {
+                        def response = httpRequest url: 'https://httpbin.org/get'
+                        echo "Réponse : ${response.content}"
+                    } catch (Exception e) {
+                        error "erreur :  ${e.message}"
                     }
                 }
             }
         }
     }
-}
 
+    post {
+        success {
+            echo "ce que je veux s'est bien passé !"
+        }
+        failure {
+            echo "ce que je veux ne s'est pas bien passé :("
+        }
+        always {
+            echo "s'execute toujours"
+        }
+    }
+}
