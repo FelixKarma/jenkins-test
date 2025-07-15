@@ -5,37 +5,14 @@ pipeline {
     }
     environment {
         url_api = "http://youtube.com"
+        SONAR_TOKEN = credentials('sonar-token')
     }
     
     stages {
-        stage("build") {
-            steps {
-                bat 'mvn clean compile'
-            }
-        }
+        
         stage("etape1") {
-            steps {
-                echo "ce que je veux"
-                script {
-                    def unNom = 2
-                    echo "${unNom}"
-                }
-            }
-        }
-
-        stage("Parallèle") {
-            parallel {
-                stage("jobA") {
-                    steps {
-                        echo "Tâche parallèle A"
-                    }
-                }
-                stage("jobB") {
-                    steps {
-                        echo "Tâche parallèle B"
-                    }
-                }
-            }
+            withSonarQubeEnv('SonarQube') {
+                mvn sonar:sonar
         }
 
         stage("url-api") {
