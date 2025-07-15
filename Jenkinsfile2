@@ -1,46 +1,38 @@
+
+
 pipeline {
-    agent any
-
+    agent none
     stages {
-        stage("Parallèle et Séquentiel") {
+        stage('Run Tests') {
             parallel {
-                branche1 {
-                    stages {
-                        stage("Étape 1 - Compilation") {
-                            steps {
-                                echo "Compilation du projet"
-                            }
-                        }
-                        stage("Étape 2 - Tests") {
-                            steps {
-                                echo "Exécution des tests"
-                            }
+                stage('Test On Windows') {
+                    agent {
+                        label "windows"
+                    }
+                    steps {
+                        bat "run-tests.bat"
+                    }
+                    post {
+                        always {
+                            junit "**/TEST-*.xml"
                         }
                     }
                 }
-
-                branche2 {
-                    stages {
-                        stage("Analyse statique") {
-                            steps {
-                                echo "Analyse du code avec SonarQube"
-                            }
+                stage('Test On Linux') {
+                    agent {
+                        label "linux"
+                    }
+                    steps {
+                        sh "run-tests.sh"
+                    }
+                    post {
+                        always {
+                            junit "**/TEST-*.xml"
                         }
                     }
                 }
             }
-        }
-
-        stage("Déploiement") {
-            steps {
-                echo "Déploiement en production"
-            }
-        }
-    }
-
-    post {
-        always {
-            echo "Fin du pipeline"
         }
     }
 }
+
